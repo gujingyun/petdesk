@@ -5,31 +5,31 @@
 
 ## M1 基础框架 (第1月)
 
-### W1: 项目搭建、技术选型、架构设计
-- [ ] 创建Android项目骨架
-- [ ] 配置Kotlin + Jetpack Compose环境
-- [ ] 设置MVVM + Clean Architecture架构
-- [ ] 配置Hilt依赖注入
-- [ ] 配置Retrofit + OkHttp网络层
-- [ ] 配置Room数据库
-- [ ] 配置Kotlin Coroutines + Flow
-- [ ] 配置Glide图片加载
-- [ ] 配置Lottie动画引擎
-- [ ] 创建技术架构文档
+### W1: 项目搭建、技术选型、架构设计 ✅ 已完成
+- [x] 创建Android项目骨架
+- [x] 配置Kotlin + Jetpack Compose环境
+- [x] 设置MVVM + Clean Architecture架构
+- [x] 配置Hilt依赖注入
+- [x] 配置Retrofit + OkHttp网络层
+- [x] 配置Room数据库
+- [x] 配置Kotlin Coroutines + Flow
+- [x] 配置Glide图片加载
+- [x] 配置Lottie动画引擎
+- [x] 创建技术架构文档
 
-### W2: 悬浮窗模块开发
-- [ ] 实现悬浮窗显示/隐藏功能
-- [ ] 实现悬浮窗拖拽移动功能
-- [ ] 实现点击互动触发功能
-- [ ] 实现长按唤出管理菜单功能
-- [ ] 实现自动贴边吸附功能
-- [ ] 实现多场景显示控制功能
-- [ ] 实现透明度调节功能
-- [ ] 实现大小调节功能(S/M/L)
-- [ ] 处理SYSTEM_ALERT_WINDOW权限申请
-- [ ] 处理FOREGROUND_SERVICE权限申请
+### W2: 悬浮窗模块开发 ✅ 已完成
+- [x] 实现悬浮窗显示/隐藏功能
+- [x] 实现悬浮窗拖拽移动功能
+- [x] 实现点击互动触发功能
+- [x] 实现长按唤出管理菜单功能
+- [x] 实现自动贴边吸附功能
+- [x] 实现多场景显示控制功能
+- [x] 实现透明度调节功能
+- [x] 实现大小调节功能(S/M/L)
+- [x] 处理SYSTEM_ALERT_WINDOW权限申请
+- [x] 处理FOREGROUND_SERVICE权限申请
 
-### W3: 权限管理模块开发
+### W3: 权限管理模块开发 🚧 进行中 (10%)
 - [ ] 实现权限状态查看功能
 - [ ] 实现权限一键申请功能
 - [ ] 实现权限说明展示功能

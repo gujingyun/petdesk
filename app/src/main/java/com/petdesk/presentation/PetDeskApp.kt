@@ -11,7 +11,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.petdesk.domain.repository.PermissionRepository
+import com.petdesk.presentation.chat.ChatScreen
+import com.petdesk.presentation.home.HomeScreen
 import com.petdesk.presentation.permission.PermissionScreen
+import com.petdesk.presentation.skills.SkillsScreen
+import com.petdesk.presentation.viewmodel.FloatingWindowViewModel
 import com.petdesk.presentation.viewmodel.PermissionViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -23,21 +27,26 @@ import javax.inject.Inject
 /**
  * 应用导航目标
  */
-sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object Permission : Screen("permission")
+sealed class Screen(val route: String, val title: String, val icon: @Composable () -> Unit = {}) {
+    object Home : Screen("home", "桌宠", { Icon(Icons.Default.Pets, contentDescription = "桌宠") })
+    object Chat : Screen("chat", "对话", { Icon(Icons.Default.Chat, contentDescription = "对话") })
+    object Skills : Screen("skills", "技能", { Icon(Icons.Default.Psychology, contentDescription = "技能") })
+    object Permission : Screen("permission", "权限", { Icon(Icons.Default.Security, contentDescription = "权限") })
 }
 
 /**
  * 主应用入口
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PetDeskApp(
-    permissionViewModel: PermissionViewModel = hiltViewModel()
+    permissionViewModel: PermissionViewModel = hiltViewModel(),
+    floatingWindowViewModel: FloatingWindowViewModel = hiltViewModel()
 ) {
     var currentScreen by remember { mutableStateOf<Screen>(Screen.Home) }
 
     val permissionState by permissionViewModel.uiState.collectAsState()
+    val petState by floatingWindowViewModel.petState.collectAsState()
 
     // 检查是否需要显示权限引导
     LaunchedEffect(permissionState.permissionState) {
@@ -47,13 +56,34 @@ fun PetDeskApp(
     }
 
     Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("桌宠管理") },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
+        },
         bottomBar = {
             NavigationBar {
                 NavigationBarItem(
-                    icon = { Icon(Icons.Default.Pets, contentDescription = "桌宠") },
-                    label = { Text("桌宠") },
+                    icon = Screen.Home.icon,
+                    label = { Text(Screen.Home.title) },
                     selected = currentScreen == Screen.Home,
                     onClick = { currentScreen = Screen.Home }
+                )
+                NavigationBarItem(
+                    icon = Screen.Chat.icon,
+                    label = { Text(Screen.Chat.title) },
+                    selected = currentScreen == Screen.Chat,
+                    onClick = { currentScreen = Screen.Chat }
+                )
+                NavigationBarItem(
+                    icon = Screen.Skills.icon,
+                    label = { Text(Screen.Skills.title) },
+                    selected = currentScreen == Screen.Skills,
+                    onClick = { currentScreen = Screen.Skills }
                 )
                 NavigationBarItem(
                     icon = {
@@ -69,7 +99,7 @@ fun PetDeskApp(
                     },
                     label = {
                         Text(
-                            text = "权限",
+                            text = Screen.Permission.title,
                             color = if (!permissionState.permissionState.allRequiredGranted) {
                                 MaterialTheme.colorScheme.error
                             } else {
@@ -90,9 +120,17 @@ fun PetDeskApp(
         ) {
             when (currentScreen) {
                 Screen.Home -> HomeScreen(
-                    allRequiredPermissionsGranted = permissionState.permissionState.allRequiredGranted,
-                    onNavigateToPermission = { currentScreen = Screen.Permission }
+                    isPetVisible = petState.isVisible,
+                    petTransparency = petState.transparency,
+                    petSize = petState.size.name.lowercase(),
+                    onToggleVisibility = { floatingWindowViewModel.updateVisibility(!petState.isVisible) },
+                    onAdjustTransparency = { floatingWindowViewModel.updateTransparency(it) },
+                    onAdjustSize = { floatingWindowViewModel.updateSize(it) },
+                    onNavigateToChat = { currentScreen = Screen.Chat },
+                    onNavigateToSkills = { currentScreen = Screen.Skills }
                 )
+                Screen.Chat -> ChatScreen()
+                Screen.Skills -> SkillsScreen()
                 Screen.Permission -> PermissionScreen(
                     viewModel = permissionViewModel,
                     onPermissionGranted = {
@@ -103,75 +141,6 @@ fun PetDeskApp(
                     }
                 )
             }
-        }
-    }
-}
-
-/**
- * 首页占位符
- */
-@Composable
-private fun HomeScreen(
-    allRequiredPermissionsGranted: Boolean,
-    onNavigateToPermission: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally
-    ) {
-        Icon(
-            imageVector = Icons.Default.Pets,
-            contentDescription = null,
-            modifier = Modifier.size(80.dp),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            text = "桌宠管理",
-            style = MaterialTheme.typography.headlineMedium
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        if (!allRequiredPermissionsGranted) {
-            Card(
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
-            ) {
-                Row(
-                    modifier = Modifier.padding(16.dp),
-                    verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Warning,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "需要授予必要权限才能使用",
-                        color = MaterialTheme.colorScheme.error
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(onClick = onNavigateToPermission) {
-                Text("前往设置权限")
-            }
-        } else {
-            Text(
-                text = "权限已全部授予，可以正常使用",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.primary
-            )
         }
     }
 }

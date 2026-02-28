@@ -14,17 +14,18 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.compose.ui.graphics.Color
 
 private val LightColorScheme = lightColorScheme(
-    primary = android.graphics.Color.parseColor("#6C5CE7"),
-    secondary = android.graphics.Color.parseColor("#00CEC9"),
-    tertiary = android.graphics.Color.parseColor("#FD79A8")
+    primary = Color(0xFF6C5CE7),
+    secondary = Color(0xFF00CEC9),
+    tertiary = Color(0xFFFD79A8)
 )
 
 private val DarkColorScheme = darkColorScheme(
-    primary = android.graphics.Color.parseColor("#6C5CE7"),
-    secondary = android.graphics.Color.parseColor("#00CEC9"),
-    tertiary = android.graphics.Color.parseColor("#FD79A8")
+    primary = Color(0xFF6C5CE7),
+    secondary = Color(0xFF00CEC9),
+    tertiary = Color(0xFFFD79A8)
 )
 
 @Composable

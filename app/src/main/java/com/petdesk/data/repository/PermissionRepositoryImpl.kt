@@ -271,12 +271,8 @@ class PermissionRepositoryImpl @Inject constructor(
 
     private fun checkStoragePermission(): PermissionStatus {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Settings.canManageExternalStorage()) {
-                PermissionStatus.GRANTED
-            } else {
-                // 对于Android 11+，我们使用分区存储，可能不需要完全访问
-                PermissionStatus.GRANTED
-            }
+            // Android 11+ uses scoped storage, so we just check basic storage access
+            PermissionStatus.GRANTED
         } else {
             val readPermission = ContextCompat.checkSelfPermission(
                 context, Manifest.permission.READ_EXTERNAL_STORAGE

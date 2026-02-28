@@ -152,7 +152,7 @@ class PermissionViewModel @Inject constructor(
      * 获取厂商特定的应用设置Intent
      */
     fun getManufacturerAppSettingsIntent(): Intent {
-        return manufacturerAdapter.createManufacturerAppSettingsIntent(context)
+        return manufacturerAdapter.getPermissionSettingsIntent()
     }
 
     /**
@@ -177,7 +177,7 @@ class PermissionViewModel @Inject constructor(
             PermissionType.SYSTEM_ALERT_WINDOW -> requestOverlayPermission()
             PermissionType.PACKAGE_USAGE_STATS -> requestUsageStatsPermission()
             PermissionType.BIND_ACCESSIBILITY_SERVICE -> requestAccessibilityServicePermission()
-            else -> permissionRepository.createManufacturerAppSettingsIntent(context)
+            else -> manufacturerAdapter.getPermissionSettingsIntent()
         }
     }
 

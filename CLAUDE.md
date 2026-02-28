@@ -6,6 +6,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 This is an Android desktop pet application (桌宠管理APP) - an AI-powered virtual pet that displays as a floating window on the device, featuring chat, task execution, and desktop organization capabilities.
 
+## Core Features
+
+- F1: Floating window display control
+- F2: Chat conversation
+- F3: Desktop organization
+- F4: Task execution (Agent)
+- F5: Skin/theming system
+- F6: Skills marketplace
+- F7: Memory system
+- F8: Voice interaction
+- F9: Permission management
+- F10: Settings
+- F11: Account system
+- F12: Data sync
+
 ## Build Commands
 
 ```bash
@@ -87,7 +102,9 @@ The app requires several special permissions:
 
 - **W1 (Project Setup)**: Completed
 - **W2 (Floating Window)**: Completed
-- **W3 (Permission Management)**: In progress (10%)
+- **W3 (Permission Management)**: Completed
+- **W4 (Database & Main UI)**: Completed
+- **W5 (LLM Integration & Chat)**: In progress
 
 See `TASKS.md` for detailed task breakdown.
 
@@ -100,6 +117,38 @@ See `TASKS.md` for detailed task breakdown.
 
 ## Testing
 
+### Test Dependencies
+- JUnit 4.13.2
+- MockK 1.13.10
+- Kotlin Coroutines Test 1.8.0
+- Turbine 1.1.0
+- Room Testing 2.6.1
+
+### Test Coverage
+- **Target**: 80%
+- **W2 Floating Window**: 100%
+- **W3 Permission Management**: 90%
+- **W4 Database**: 85%
+
+### Running Tests
+
+```bash
+# Run all unit tests
+gradle test
+
+# Run W2 module tests
+gradle :app:testDebugUnitTest --tests "com.petdesk.presentation.viewmodel.FloatingWindowViewModelTest"
+
+# Run W3 module tests
+gradle :app:testDebugUnitTest --tests "com.petdesk.data.repository.PermissionRepositoryImplTest"
+
+# Run single test class
+gradle :app:testDebugUnitTest --tests "com.petdesk.presentation.viewmodel.FloatingWindowViewModelTest"
+
+# Run single test method
+gradle :app:testDebugUnitTest --tests "com.petdesk.presentation.viewmodel.FloatingWindowTest"
+```
+
 Test files are located alongside source files with `Test` suffix:
-- Unit tests in `src/test/java/com/petdesk/`
-- Android tests in `src/androidTest/java/com/petdesk/`
+- Unit tests in `app/src/test/java/com/petdesk/`
+- Android tests in `app/src/androidTest/java/com/petdesk/`

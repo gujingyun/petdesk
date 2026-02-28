@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+  <!-- Pet face - centered in safe zone (centered 66x66 area) -->
+  <path
+      android:fillColor="#FFFFFF"
+      android:pathData="M54,54m-24,0a24,24 0,1 1,48 0a24,24 0,1 1,-48 0"/>
+  <!-- Eyes -->
+  <path
+      android:fillColor="#6C5CE7"
+      android:pathData="M44,48m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+  <path
+      android:fillColor="#6C5CE7"
+      android:pathData="M64,48m-4,0a4,4 0,1 1,8 0a4,4 0,1 1,-8 0"/>
+  <!-- Smile -->
+  <path
+      android:strokeColor="#6C5CE7"
+      android:strokeWidth="3"
+      android:strokeLineCap="round"
+      android:pathData="M44,60c4,4 8,4 16,0"/>
+</vector>

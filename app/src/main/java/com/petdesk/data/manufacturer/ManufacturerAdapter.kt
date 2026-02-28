@@ -16,7 +16,7 @@ import javax.inject.Singleton
 class ManufacturerAdapter @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
-    private val manufacturer: Manufacturer by lazy {
+    private val detectedManufacturer: Manufacturer by lazy {
         detectManufacturer()
     }
 
@@ -24,13 +24,13 @@ class ManufacturerAdapter @Inject constructor(
      * 检测设备厂商
      */
     private fun detectManufacturer(): Manufacturer {
-        val manufacturer = Build.MANUFACTURER.lowercase()
+        val manufacturerName = Build.MANUFACTURER.lowercase()
         return when {
-            manufacturer.contains("huawei") || manufacturer.contains("honor") -> Manufacturer.HUAWEI
-            manufacturer.contains("xiaomi") || manufacturer.contains("redmi") -> Manufacturer.XIAOMI
-            manufacturer.contains("oppo") || manufacturer.contains("realme") -> Manufacturer.OPPO
-            manufacturer.contains("vivo") || manufacturer.contains("iqoo") -> Manufacturer.VIVO
-            manufacturer.contains("samsung") -> Manufacturer.SAMSUNG
+            manufacturerName.contains("huawei") || manufacturerName.contains("honor") -> Manufacturer.HUAWEI
+            manufacturerName.contains("xiaomi") || manufacturerName.contains("redmi") -> Manufacturer.XIAOMI
+            manufacturerName.contains("oppo") || manufacturerName.contains("realme") -> Manufacturer.OPPO
+            manufacturerName.contains("vivo") || manufacturerName.contains("iqoo") -> Manufacturer.VIVO
+            manufacturerName.contains("samsung") -> Manufacturer.SAMSUNG
             else -> Manufacturer.OTHER
         }
     }
@@ -38,13 +38,13 @@ class ManufacturerAdapter @Inject constructor(
     /**
      * 获取当前厂商
      */
-    fun getManufacturer(): Manufacturer = manufacturer
+    fun getManufacturer(): Manufacturer = detectedManufacturer
 
     /**
      * 获取厂商名称（中文）
      */
     fun getManufacturerName(): String {
-        return when (manufacturer) {
+        return when (detectedManufacturer) {
             Manufacturer.HUAWEI -> "华为"
             Manufacturer.XIAOMI -> "小米"
             Manufacturer.OPPO -> "OPPO"
@@ -58,7 +58,7 @@ class ManufacturerAdapter @Inject constructor(
      * 获取厂商特定的应用启动管理设置Intent
      */
     fun getAutoStartSettingsIntent(): Intent? {
-        val intent = when (manufacturer) {
+        val intent = when (detectedManufacturer) {
             Manufacturer.HUAWEI -> createHuaweiAutoStartIntent()
             Manufacturer.XIAOMI -> createXiaomiAutoStartIntent()
             Manufacturer.OPPO -> createOppoAutoStartIntent()
@@ -83,7 +83,7 @@ class ManufacturerAdapter @Inject constructor(
      * 获取厂商特定的权限管理设置Intent
      */
     fun getPermissionSettingsIntent(): Intent {
-        val intent = when (manufacturer) {
+        val intent = when (detectedManufacturer) {
             Manufacturer.HUAWEI -> createHuaweiPermissionIntent()
             Manufacturer.XIAOMI -> createXiaomiPermissionIntent()
             Manufacturer.OPPO -> createOppoPermissionIntent()
@@ -98,7 +98,7 @@ class ManufacturerAdapter @Inject constructor(
      * 获取权限设置引导信息
      */
     fun getPermissionGuideMessage(): String {
-        return when (manufacturer) {
+        return when (detectedManufacturer) {
             Manufacturer.HUAWEI -> """
                 华为/荣耀设备设置指南：
                 1. 进入"设置" > "应用" > "应用启动管理"

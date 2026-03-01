@@ -1,28 +1,36 @@
 package com.petdesk.domain.model
 
+import com.google.gson.annotations.SerializedName
+
 /**
  * LLM 请求模型
  */
 data class LLMRequest(
     val model: String = "qwen-max",
     val input: Input,
-    val parameters: Parameters? = null
+    @SerializedName("parameters")
+    val params: Parameters? = null,
+    val stream: Boolean = false
 ) {
     data class Input(
         val messages: List<Message>
     )
-    
+
     data class Message(
         val role: String,
         val content: String
     )
-    
+
     data class Parameters(
-        val result_format: String = "message",
-        val incremental_output: Boolean = true,
+        @SerializedName("result_format")
+        val resultFormat: String = "message",
+        @SerializedName("incremental_output")
+        val incrementalOutput: Boolean = true,
         val temperature: Float = 0.7f,
-        val top_p: Float = 0.8f,
-        val max_tokens: Int = 2000,
+        @SerializedName("top_p")
+        val topP: Float = 0.8f,
+        @SerializedName("max_tokens")
+        val maxTokens: Int = 2000,
         val stop: List<String>? = null
     )
 }

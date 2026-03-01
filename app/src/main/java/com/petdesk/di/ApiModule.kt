@@ -1,7 +1,8 @@
 package com.petdesk.di
 
+import com.petdesk.BuildConfig
+import com.petdesk.data.remote.LLMRepositoryImpl
 import com.petdesk.data.remote.QwenApiService
-import com.petdesk.data.repository.LLMRepositoryImpl
 import com.petdesk.domain.repository.LLMRepository
 import dagger.Module
 import dagger.Provides
@@ -44,7 +45,7 @@ object ApiModule {
     @Singleton
     fun provideRetrofit(okHttpClient: OkHttpClient): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://dashscope.aliyuncs.com/compatible-mode/v1/")
+            .baseUrl("https://dashscope.aliyuncs.com/")
             .client(okHttpClient)
             .addConverterFactory(GsonConverterFactory.create())
             .build()

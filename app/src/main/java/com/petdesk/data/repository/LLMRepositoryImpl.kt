@@ -4,6 +4,7 @@ import com.petdesk.domain.model.LLMMessage
 import com.petdesk.domain.model.LLMRequest
 import com.petdesk.domain.repository.LLMRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import okhttp3.ResponseBody
 import retrofit2.HttpException

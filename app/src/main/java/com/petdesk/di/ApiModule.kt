@@ -3,7 +3,11 @@ package com.petdesk.di
 import com.petdesk.BuildConfig
 import com.petdesk.data.remote.LLMRepositoryImpl
 import com.petdesk.data.remote.QwenApiService
+import com.petdesk.data.repository.IntentRecognizerRepositoryImpl
+import com.petdesk.data.repository.TaskPlannerRepositoryImpl
+import com.petdesk.domain.repository.IntentRecognizerRepository
 import com.petdesk.domain.repository.LLMRepository
+import com.petdesk.domain.repository.TaskPlannerRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -66,5 +70,21 @@ object ApiModule {
             qwenApiService = qwenApiService,
             apiKey = BuildConfig.QWEN_API_KEY
         )
+    }
+    
+    @Provides
+    @Singleton
+    fun provideIntentRecognizerRepository(
+        qwenApiService: QwenApiService
+    ): IntentRecognizerRepository {
+        return IntentRecognizerRepositoryImpl(qwenApiService)
+    }
+    
+    @Provides
+    @Singleton
+    fun provideTaskPlannerRepository(
+        qwenApiService: QwenApiService
+    ): TaskPlannerRepository {
+        return TaskPlannerRepositoryImpl(qwenApiService)
     }
 }

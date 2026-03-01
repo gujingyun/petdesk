@@ -9,26 +9,29 @@ import kotlinx.coroutines.flow.Flow
  */
 @Dao
 interface TaskDao {
-    @Query("SELECT * FROM tasks WHERE userId = :userId ORDER BY createdAt DESC")
+    @Query("SELECT * FROM tasks WHERE userId = :userId ORDER BY priority DESC, createdAt DESC")
     fun getTasksByUserId(userId: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE userId = :userId AND status = :status ORDER BY priority DESC, createdAt DESC")
-    fun getTasksByStatus(userId: Long, status: Int): Flow<List<TaskEntity>>
+    fun getTasksByStatus(userId: Long, status: String): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM tasks WHERE userId = :userId AND taskType = :taskType ORDER BY createdAt DESC")
+    @Query("SELECT * FROM tasks WHERE userId = :userId AND taskType = :taskType ORDER BY priority DESC, createdAt DESC")
     fun getTasksByType(userId: Long, taskType: String): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM tasks WHERE userId = :userId AND scheduledAt > 0 AND scheduledAt <= :time AND status = 0 ORDER BY priority DESC")
+    @Query("SELECT * FROM tasks WHERE userId = :userId AND scheduledAt > 0 AND scheduledAt <= :time AND status = 'PENDING' ORDER BY priority DESC")
     fun getScheduledTasks(userId: Long, time: Long): Flow<List<TaskEntity>>
 
     @Query("SELECT * FROM tasks WHERE id = :id")
     suspend fun getTaskById(id: Long): TaskEntity?
 
-    @Query("SELECT * FROM tasks WHERE userId = :userId ORDER BY createdAt DESC LIMIT :limit")
+    @Query("SELECT * FROM tasks WHERE userId = :userId ORDER BY priority DESC, createdAt DESC LIMIT :limit")
     fun getRecentTasks(userId: Long, limit: Int): Flow<List<TaskEntity>>
 
-    @Query("SELECT * FROM tasks WHERE userId = :userId AND title LIKE '%' || :keyword || '%'")
+    @Query("SELECT * FROM tasks WHERE userId = :userId AND (title LIKE '%' || :keyword || '%' OR description LIKE '%' || :keyword || '%')")
     fun searchTasks(userId: Long, keyword: String): Flow<List<TaskEntity>>
+
+    @Query("SELECT * FROM tasks WHERE userId = :userId AND status IN ('PENDING', 'RUNNING') ORDER BY priority DESC, createdAt ASC")
+    fun getPendingTasks(userId: Long): Flow<List<TaskEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertTask(task: TaskEntity): Long
@@ -43,14 +46,23 @@ interface TaskDao {
     suspend fun deleteAllTasksByUserId(userId: Long)
 
     @Query("UPDATE tasks SET status = :status, updatedAt = :timestamp WHERE id = :id")
-    suspend fun updateTaskStatus(id: Long, status: Int, timestamp: Long)
+    suspend fun updateTaskStatus(id: Long, status: String, timestamp: Long)
 
-    @Query("UPDATE tasks SET status = 2, completedAt = :timestamp, result = :result WHERE id = :id")
+    @Query("UPDATE tasks SET status = 'RUNNING', startedAt = :timestamp, updatedAt = :timestamp WHERE id = :id")
+    suspend fun startTask(id: Long, timestamp: Long)
+
+    @Query("UPDATE tasks SET status = 'COMPLETED', completedAt = :timestamp, result = :result, updatedAt = :timestamp WHERE id = :id")
     suspend fun completeTask(id: Long, timestamp: Long, result: String)
 
-    @Query("UPDATE tasks SET status = 3, errorMessage = :errorMessage WHERE id = :id")
-    suspend fun failTask(id: Long, errorMessage: String)
+    @Query("UPDATE tasks SET status = 'FAILED', errorMessage = :errorMessage, updatedAt = :timestamp WHERE id = :id")
+    suspend fun failTask(id: Long, timestamp: Long, errorMessage: String)
+
+    @Query("UPDATE tasks SET status = 'CANCELLED', updatedAt = :timestamp WHERE id = :id")
+    suspend fun cancelTask(id: Long, timestamp: Long)
 
     @Query("SELECT COUNT(*) FROM tasks WHERE userId = :userId AND status = :status")
-    suspend fun getTaskCountByStatus(userId: Long, status: Int): Int
+    suspend fun getTaskCountByStatus(userId: Long, status: String): Int
+
+    @Query("SELECT COUNT(*) FROM tasks WHERE userId = :userId AND status IN ('PENDING', 'RUNNING')")
+    suspend fun getActiveTaskCount(userId: Long): Int
 }

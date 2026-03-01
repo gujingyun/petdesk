@@ -6,6 +6,14 @@ plugins {
     id 'com.google.dagger.hilt.android'
 }
 
+// 读取 local.properties 中的 API Key
+def localProperties = new Properties()
+def localPropertiesFile = rootProject.file('local.properties')
+if (localPropertiesFile.exists()) {
+    localProperties.load(new FileInputStream(localPropertiesFile))
+}
+def qwenApiKey = localProperties.getProperty('QWEN_API_KEY', '')
+
 android {
     namespace 'com.petdesk'
     compileSdk 34
@@ -38,7 +46,7 @@ android {
         versionCode 1
         versionName "1.0"
         
-        buildConfigField "String", "QWEN_API_KEY", "\"${System.getenv('QWEN_API_KEY') ?: ""}\""
+        buildConfigField "String", "QWEN_API_KEY", "\"${qwenApiKey}\""
         
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

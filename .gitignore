@@ -72,3 +72,4 @@ lint/tmp/
 
 # Windows
 Thumbs.db
+local.properties

@@ -40,6 +40,11 @@ class TaskRepositoryImpl @Inject constructor(
             entities.map { it.toDomainModel() }
         }
 
+    override fun getUpcomingScheduledTasks(userId: Long): Flow<List<Task>> =
+        taskDao.getUpcomingScheduledTasks(userId, System.currentTimeMillis()).map { entities ->
+            entities.map { it.toDomainModel() }
+        }
+
     override fun getRecentTasks(userId: Long, limit: Int): Flow<List<Task>> =
         taskDao.getRecentTasks(userId, limit).map { entities ->
             entities.map { it.toDomainModel() }

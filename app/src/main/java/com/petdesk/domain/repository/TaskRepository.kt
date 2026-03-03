@@ -13,6 +13,7 @@ interface TaskRepository {
     fun getTasksByStatus(userId: Long, status: TaskStatus): Flow<List<Task>>
     fun getTasksByType(userId: Long, taskType: TaskType): Flow<List<Task>>
     fun getScheduledTasks(userId: Long, time: Long): Flow<List<Task>>
+    fun getUpcomingScheduledTasks(userId: Long): Flow<List<Task>>
     fun getRecentTasks(userId: Long, limit: Int): Flow<List<Task>>
     fun getPendingTasks(userId: Long): Flow<List<Task>>
     fun searchTasks(userId: Long, keyword: String): Flow<List<Task>>

@@ -20,7 +20,7 @@ class IntentRecognizerRepositoryImpl @Inject constructor(
 ) : IntentRecognizerRepository {
 
     companion object {
-        private const val SYSTEM_PROMPT = """
+        private val SYSTEM_PROMPT = """
 你是一个任务意图识别助手。请分析用户输入，识别其意图并返回 JSON 格式的结果。
 
 可用的任务类型：
@@ -63,9 +63,12 @@ class IntentRecognizerRepositoryImpl @Inject constructor(
         )
 
         val response = qwenApiService.chat(request)
-        
+
         if (response.isSuccessful) {
-            val content = response.body()?.output?.choices?.firstOrNull()?.message?.content ?: ""
+            // 优先使用 output.text，其次使用 choices[0].message.content
+            val content = response.body()?.output?.text
+                ?: response.body()?.output?.choices?.firstOrNull()?.message?.content
+                ?: ""
             return parseIntentResponse(content, userInput)
         } else {
             // 返回默认结果

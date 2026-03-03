@@ -2,6 +2,7 @@ package com.petdesk.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.petdesk.data.local.entity.UserEntity
 import com.petdesk.domain.model.Task
 import com.petdesk.domain.model.TaskPriority
 import com.petdesk.domain.model.TaskStatus
@@ -15,6 +16,8 @@ import com.petdesk.domain.repository.IntentRecognizerRepository
 import com.petdesk.domain.repository.TaskExecutor
 import com.petdesk.domain.repository.TaskPlannerRepository
 import com.petdesk.domain.repository.TaskRepository
+import com.petdesk.domain.repository.UserRepository
+import android.util.Log
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -32,7 +35,8 @@ class TaskExecutionViewModel @Inject constructor(
     private val taskRepository: TaskRepository,
     private val taskExecutor: TaskExecutor,
     private val intentRecognizerRepository: IntentRecognizerRepository,
-    private val taskPlannerRepository: TaskPlannerRepository
+    private val taskPlannerRepository: TaskPlannerRepository,
+    private val userRepository: UserRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(TaskExecutionUiState())
@@ -64,10 +68,13 @@ class TaskExecutionViewModel @Inject constructor(
 
                 val intent = intentRecognizerRepository.recognizeIntent(
                     userInput = userInput,
-                    context = emptyMap()
+                    context = emptyList()
                 )
 
+                Log.d("TaskExecution", "Intent recognized: type=${intent.taskType}, confidence=${intent.confidence}")
+
                 if (!isValidIntent(intent)) {
+                    Log.w("TaskExecution", "Invalid intent: confidence=${intent.confidence}, type=${intent.taskType}")
                     handleFailure(null, "无法理解您的请求，请重新描述任务")
                     return@launch
                 }
@@ -80,8 +87,10 @@ class TaskExecutionViewModel @Inject constructor(
                 val plan = taskPlannerRepository.planTask(
                     userInput = userInput,
                     intent = intent,
-                    context = emptyMap()
+                    context = emptyList()
                 )
+
+                Log.d("TaskExecution", "Task planned: steps=${plan.steps.size}, requiresConfirmation=${plan.requiresConfirmation}")
 
                 if (plan.steps.isEmpty()) {
                     handleFailure(null, "无法生成任务步骤，请重新描述任务")
@@ -171,10 +180,14 @@ class TaskExecutionViewModel @Inject constructor(
 
         try {
             // 使用 Flow 收集执行结果
+            Log.d("TaskExecution", "Starting task execution with ${plan.steps.size} steps")
             taskExecutor.execute(plan, task).collect { result ->
+                Log.d("TaskExecution", "Received result: success=${result.success}, stepResults=${result.stepResults.size}")
                 handleExecutionResult(result, task)
             }
+            Log.d("TaskExecution", "Flow collection completed")
         } catch (e: Exception) {
+            Log.e("TaskExecution", "Execution error", e)
             handleFailure(task, e.message ?: "执行过程中发生错误")
         }
     }
@@ -182,7 +195,7 @@ class TaskExecutionViewModel @Inject constructor(
     /**
      * 处理执行结果
      */
-    private fun handleExecutionResult(result: TaskExecutionResult, task: Task) {
+    private suspend fun handleExecutionResult(result: TaskExecutionResult, task: Task) {
         val currentStep = result.stepResults.size
         val totalSteps = result.plan.steps.size
         val currentStepDesc = result.plan.steps.getOrNull(currentStep - 1)?.description
@@ -207,6 +220,7 @@ class TaskExecutionViewModel @Inject constructor(
 
         if (result.success) {
             // 任务完成
+            Log.d("TaskExecution", "Task completed successfully")
             taskRepository.completeTask(task.id, result.finalResult)
 
             updateState(
@@ -329,8 +343,19 @@ class TaskExecutionViewModel @Inject constructor(
         userInput: String,
         intent: IntentRecognitionResult
     ): Task {
+        // 确保用户存在，如果不存在则创建默认用户
+        var currentUserId = userId
+        if (userRepository.getCurrentUser() == null) {
+            val defaultUser = UserEntity(
+                username = "default_user",
+                nickname = "默认用户"
+            )
+            currentUserId = userRepository.insertUser(defaultUser)
+            Log.d("TaskExecution", "Created default user with id: $currentUserId")
+        }
+
         val task = Task(
-            userId = userId,
+            userId = currentUserId,
             title = userInput.take(50),
             description = userInput,
             type = intent.taskType,
@@ -348,7 +373,9 @@ class TaskExecutionViewModel @Inject constructor(
      * 验证意图识别结果
      */
     private fun isValidIntent(intent: IntentRecognitionResult): Boolean {
-        return intent.confidence >= 0.5f && intent.taskType != TaskType.CUSTOM
+        // confidence >= 0.3 表示 API 成功解析了请求
+        // 允许 CUSTOM 类型任务执行（作为通用任务）
+        return intent.confidence >= 0.3f
     }
 
     /**

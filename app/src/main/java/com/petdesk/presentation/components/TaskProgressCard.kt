@@ -1,8 +1,11 @@
 package com.petdesk.presentation.components
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.linearprogressindicator.LinearProgressIndicator
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -76,28 +79,28 @@ fun TaskProgressCard(
 private fun StatusHeader(state: TaskExecutionState) {
     val (title, subtitle, color) = when (state) {
         is TaskExecutionState.Idle ->
-            "准备就绪" to "等待任务开始" to MaterialTheme.colorScheme.onSurface
+            Triple("准备就绪", "等待任务开始", MaterialTheme.colorScheme.onSurface)
 
         is TaskExecutionState.Loading ->
-            "加载中" to "正在初始化..." to MaterialTheme.colorScheme.primary
+            Triple("加载中", "正在初始化...", MaterialTheme.colorScheme.primary)
 
         is TaskExecutionState.Planning ->
-            "分析中" to state.message to MaterialTheme.colorScheme.primary
+            Triple("分析中", state.message, MaterialTheme.colorScheme.primary)
 
         is TaskExecutionState.Planned ->
-            "待确认" to "请确认是否执行此任务" to MaterialTheme.colorScheme.secondary
+            Triple("待确认", "请确认是否执行此任务", MaterialTheme.colorScheme.secondary)
 
         is TaskExecutionState.Executing ->
-            "执行中" to "正在执行任务步骤" to MaterialTheme.colorScheme.primary
+            Triple("执行中", "正在执行任务步骤", MaterialTheme.colorScheme.primary)
 
         is TaskExecutionState.Success ->
-            "完成" to "任务执行成功" to MaterialTheme.colorScheme.onPrimary
+            Triple("完成", "任务执行成功", MaterialTheme.colorScheme.onPrimary)
 
         is TaskExecutionState.Failure ->
-            "失败" to state.errorMessage to MaterialTheme.colorScheme.error
+            Triple("失败", state.errorMessage, MaterialTheme.colorScheme.error)
 
         is TaskExecutionState.Cancelled ->
-            "已取消" to "任务已取消执行" to MaterialTheme.colorScheme.onSurfaceVariant
+            Triple("已取消", "任务已取消执行", MaterialTheme.colorScheme.onSurfaceVariant)
     }
 
     Text(

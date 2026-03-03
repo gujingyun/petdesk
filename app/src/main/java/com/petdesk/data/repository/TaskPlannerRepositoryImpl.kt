@@ -20,7 +20,7 @@ class TaskPlannerRepositoryImpl @Inject constructor(
 ) : TaskPlannerRepository {
 
     companion object {
-        private const val SYSTEM_PROMPT = """
+        private val SYSTEM_PROMPT = """
 你是一个任务规划助手。请根据用户输入和意图识别结果，将任务拆解为可执行的步骤。
 
 返回 JSON 格式：
@@ -75,9 +75,12 @@ class TaskPlannerRepositoryImpl @Inject constructor(
         )
 
         val response = qwenApiService.chat(request)
-        
+
         if (response.isSuccessful) {
-            val content = response.body()?.output?.choices?.firstOrNull()?.message?.content ?: ""
+            // 优先使用 output.text，其次使用 choices[0].message.content
+            val content = response.body()?.output?.text
+                ?: response.body()?.output?.choices?.firstOrNull()?.message?.content
+                ?: ""
             return parsePlanResponse(content, userInput, intent)
         } else {
             // 返回默认规划

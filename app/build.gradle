@@ -12,7 +12,7 @@ def localPropertiesFile = rootProject.file('local.properties')
 if (localPropertiesFile.exists()) {
     localProperties.load(new FileInputStream(localPropertiesFile))
 }
-def qwenApiKey = localProperties.getProperty('QWEN_API_KEY', '')
+def qwenApiKey = localProperties.getProperty('QWEN_API_KEY', 'sk-8fd59bb75489427fa585a97680c073ef')
 
 android {
     namespace 'com.petdesk'

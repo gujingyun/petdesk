@@ -13,8 +13,10 @@ import androidx.lifecycle.viewModelScope
 import com.petdesk.domain.repository.PermissionRepository
 import com.petdesk.presentation.chat.ChatScreen
 import com.petdesk.presentation.home.HomeScreen
+import com.petdesk.presentation.memory.MemoryScreen
 import com.petdesk.presentation.permission.PermissionScreen
 import com.petdesk.presentation.skills.SkillsScreen
+import com.petdesk.presentation.task.TaskScreen
 import com.petdesk.presentation.viewmodel.FloatingWindowViewModel
 import com.petdesk.presentation.viewmodel.PermissionViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,7 +32,9 @@ import javax.inject.Inject
 sealed class Screen(val route: String, val title: String, val icon: @Composable () -> Unit = {}) {
     object Home : Screen("home", "桌宠", { Icon(Icons.Default.Pets, contentDescription = "桌宠") })
     object Chat : Screen("chat", "对话", { Icon(Icons.Default.Chat, contentDescription = "对话") })
-    object Skills : Screen("skills", "技能", { Icon(Icons.Default.Psychology, contentDescription = "技能") })
+    object Task : Screen("task", "任务", { Icon(Icons.Default.Task, contentDescription = "任务") })
+    object Memory : Screen("memory", "记忆", { Icon(Icons.Default.Psychology, contentDescription = "记忆") })
+    object Skills : Screen("skills", "技能", { Icon(Icons.Default.AutoAwesome, contentDescription = "技能") })
     object Permission : Screen("permission", "权限", { Icon(Icons.Default.Security, contentDescription = "权限") })
 }
 
@@ -78,6 +82,18 @@ fun PetDeskApp(
                     label = { Text(Screen.Chat.title) },
                     selected = currentScreen == Screen.Chat,
                     onClick = { currentScreen = Screen.Chat }
+                )
+                NavigationBarItem(
+                    icon = Screen.Task.icon,
+                    label = { Text(Screen.Task.title) },
+                    selected = currentScreen == Screen.Task,
+                    onClick = { currentScreen = Screen.Task }
+                )
+                NavigationBarItem(
+                    icon = Screen.Memory.icon,
+                    label = { Text(Screen.Memory.title) },
+                    selected = currentScreen == Screen.Memory,
+                    onClick = { currentScreen = Screen.Memory }
                 )
                 NavigationBarItem(
                     icon = Screen.Skills.icon,
@@ -130,6 +146,8 @@ fun PetDeskApp(
                     onNavigateToSkills = { currentScreen = Screen.Skills }
                 )
                 Screen.Chat -> ChatScreen()
+                Screen.Task -> TaskScreen()
+                Screen.Memory -> MemoryScreen()
                 Screen.Skills -> SkillsScreen()
                 Screen.Permission -> PermissionScreen(
                     viewModel = permissionViewModel,
